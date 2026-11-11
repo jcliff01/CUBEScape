@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CubeScope Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Ships next to the exe and is opened on servers with no internet route, so it uses system fonts
+   only and carries no external references. Same palette family as DialerScope's manual.
+   Layout: a sticky contents rail on the left, one reading column on the right; one column on phones. */
+:root{
+  --ink:#0f1720; --ink2:#41525d; --ink3:#6b7f8c;
+  --paper:#eef1f4; --surf:#ffffff; --surf2:#f4f6f8; --surf3:#e7ecef;
+  --line:#d2dae0; --line2:#adb9c2;
+  --accent:#0d6377; --accent2:#e1eef1;
+  --ok:#2c6e4e; --okbg:#e2efe7;
+  --warn:#8a6310; --warnbg:#f7eeda;
+  --crit:#9c3423; --critbg:#f8e6e2;
+  --code:#f1f4f6;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+  --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --measure:74ch;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e3eaf0; --ink2:#a6b7c3; --ink3:#7b8f9d;
+    --paper:#0c131a; --surf:#151d25; --surf2:#1a242d; --surf3:#233039;
+    --line:#2a3842; --line2:#3f5260;
+    --accent:#5fb6cb; --accent2:#142a33;
+    --ok:#77c2a0; --okbg:#13261d;
+    --warn:#d7aa52; --warnbg:#2a2214;
+    --crit:#e28a76; --critbg:#2c1b17;
+    --code:#111a22;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e3eaf0; --ink2:#a6b7c3; --ink3:#7b8f9d;
+  --paper:#0c131a; --surf:#151d25; --surf2:#1a242d; --surf3:#233039;
+  --line:#2a3842; --line2:#3f5260;
+  --accent:#5fb6cb; --accent2:#142a33;
+  --ok:#77c2a0; --okbg:#13261d;
+  --warn:#d7aa52; --warnbg:#2a2214;
+  --crit:#e28a76; --critbg:#2c1b17;
+  --code:#111a22;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,pre,kbd,.mono{font-family:var(--mono)}
+code{background:var(--code);border:1px solid var(--line);border-radius:3px;padding:.05em .35em;font-size:.88em;
+  overflow-wrap:anywhere}
+pre{background:var(--code);border:1px solid var(--line);border-radius:4px;padding:12px 14px;overflow-x:auto;
+  font-size:12.5px;line-height:1.55;margin:12px 0;max-width:100%}
+pre code{background:none;border:0;padding:0;font-size:inherit;overflow-wrap:normal}
+pre .c{color:var(--ink3)}
+pre .hi{color:var(--crit);font-weight:600}
+pre .ok{color:var(--accent);font-weight:600}
+
+/* frame */
+.frame{display:grid;grid-template-columns:232px minmax(0,1fr);max-width:1240px;margin:0 auto;gap:0 40px;
+  padding-left:max(20px, env(safe-area-inset-left, 0px));padding-right:max(20px, env(safe-area-inset-right, 0px))}
+@media (max-width:900px){.frame{grid-template-columns:minmax(0,1fr);gap:0;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}}
+nav.rail{position:sticky;top:env(safe-area-inset-top, 0px);align-self:start;max-height:100vh;overflow-y:auto;padding:28px 0 40px;
+  font-size:12.5px;border-right:1px solid var(--line)}
+@media (max-width:900px){nav.rail{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);padding:16px 0}}
+nav.rail .brand{font-weight:700;font-size:15px;margin:0 0 14px;letter-spacing:-.01em}
+nav.rail .brand span{color:var(--accent)}
+nav.rail ol{list-style:none;margin:0;padding:0}
+nav.rail li{margin:0}
+nav.rail a{display:block;color:var(--ink2);text-decoration:none;padding:3px 10px 3px 0;border-left:2px solid transparent;
+  padding-left:10px;margin-left:-12px}
+@media (max-width:900px){nav.rail a{margin-left:0;padding-left:0}}
+nav.rail a:hover{color:var(--ink);background:var(--surf2)}
+nav.rail a .n{display:inline-block;width:2.2em;color:var(--ink3);font-family:var(--mono);font-size:11px}
+nav.rail li.sub a{padding-left:34px;font-size:12px}
+@media (max-width:900px){nav.rail li.sub{display:none}}
+nav.rail a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+main{padding:28px 0 80px;min-width:0}
+header.mast{padding:6px 0 22px;border-bottom:2px solid var(--ink);margin-bottom:34px}
+header.mast .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 12px;letter-spacing:-.02em;font-weight:750;text-wrap:balance}
+h1 span{color:var(--accent)}
+.dek{font-size:17px;color:var(--ink2);max-width:60ch;margin:0}
+.meta{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:6px 22px}
+
+section{margin:0 0 48px;scroll-margin-top:16px}
+h2{font-size:22px;font-weight:700;letter-spacing:-.015em;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line2);
+  text-wrap:balance}
+h2 .n{color:var(--ink3);font-family:var(--mono);font-size:14px;font-weight:500;margin-right:10px}
+h3{font-size:16px;font-weight:650;margin:26px 0 8px;letter-spacing:-.005em;scroll-margin-top:16px}
+h3 .n{color:var(--ink3);font-family:var(--mono);font-size:12px;font-weight:500;margin-right:8px}
+p,ul,ol{max-width:var(--measure)}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 12px;padding-left:22px}
+li{margin-bottom:5px}
+strong{font-weight:650}
+.small{font-size:13px;color:var(--ink2)}
+
+/* tables */
+.tw{overflow-x:auto;margin:12px 0 18px;border:1px solid var(--line);border-radius:4px;background:var(--surf)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;padding:8px 11px;background:var(--surf2);border-bottom:1px solid var(--line2);
+  font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
+td{padding:7px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+td.m,td.n{font-family:var(--mono);font-size:12.5px}
+td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.k{white-space:nowrap;font-weight:600}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:1px 6px;border-radius:2px;vertical-align:1px}
+.tag.crit{background:var(--critbg);color:var(--crit)}
+.tag.warn{background:var(--warnbg);color:var(--warn)}
+.tag.ok{background:var(--okbg);color:var(--ok)}
+.tag.info{background:var(--accent2);color:var(--accent)}
+
+/* callouts */
+.note{border-left:3px solid var(--accent);background:var(--accent2);padding:10px 14px;border-radius:0 4px 4px 0;
+  margin:14px 0;max-width:var(--measure)}
+.note.warn{border-left-color:var(--warn);background:var(--warnbg)}
+.note.crit{border-left-color:var(--crit);background:var(--critbg)}
+.note p{margin:0 0 6px}
+.note p:last-child{margin:0}
+.note ul{margin:4px 0 0}
+.note b.t{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.note.warn b.t{color:var(--warn)} .note.crit b.t{color:var(--crit)} .note b.t{color:var(--accent)}
+
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0 18px}
+.steps li{counter-increment:s;position:relative;padding:0 0 12px 40px;min-width:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--surf);border:1px solid var(--line2);color:var(--ink2);font-family:var(--mono);font-size:12px;
+  font-weight:700;display:grid;place-items:center}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:12px 0 18px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:4px;padding:12px 14px;min-width:0}
+.card h4{margin:0 0 6px;font-size:14px;font-weight:650}
+.card p{margin:0;font-size:13.5px;color:var(--ink2)}
+kbd{border:1px solid var(--line2);border-bottom-width:2px;border-radius:3px;padding:0 5px;font-size:.85em;background:var(--surf)}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:0 7px;border-radius:9px;border:1px solid var(--line2);
+  background:var(--surf);color:var(--ink2);white-space:nowrap}
+.pill.dim{color:var(--ink3);border-style:dashed;font-weight:500}
+footer{border-top:1px solid var(--line2);padding-top:18px;margin-top:20px;font-size:12.5px;color:var(--ink3);font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="frame">
+
+<nav class="rail" aria-label="Sections">
+  <p class="brand">Cube<span>Scope</span> manual</p>
+  <ol>
+    <li><a href="#s1"><span class="n">1</span>What it is</a></li>
+    <li><a href="#s2"><span class="n">2</span>Install &amp; build</a></li>
+    <li><a href="#s3"><span class="n">3</span>Quick start</a></li>
+    <li><a href="#s4"><span class="n">4</span>Getting the records in</a></li>
+    <li class="sub"><a href="#s4-1">4.1 Syslog files</a></li>
+    <li class="sub"><a href="#s4-2">4.2 Call record files</a></li>
+    <li class="sub"><a href="#s4-3">4.3 Both feeds, one CUBE</a></li>
+    <li class="sub"><a href="#s4-4">4.4 Files from flash</a></li>
+    <li class="sub"><a href="#s4-5">4.5 SFTP uploads lose records</a></li>
+    <li class="sub"><a href="#s4-6">4.6 CUBE settings that help</a></li>
+    <li><a href="#s5"><span class="n">5</span>Reading the dashboard</a></li>
+    <li class="sub"><a href="#s5-1">5.1 The top bar</a></li>
+    <li class="sub"><a href="#s5-2">5.2 Filter &amp; Find</a></li>
+    <li class="sub"><a href="#s5-3">5.3 Tiles</a></li>
+    <li class="sub"><a href="#s5-4">5.4 Charts</a></li>
+    <li class="sub"><a href="#s5-5">5.5 Tables</a></li>
+    <li class="sub"><a href="#s5-6">5.6 Canceled while ringing</a></li>
+    <li class="sub"><a href="#s5-7">5.7 Events &amp; config changes</a></li>
+    <li class="sub"><a href="#s5-8">5.8 The call list</a></li>
+    <li class="sub"><a href="#s5-9">5.9 One call's detail</a></li>
+    <li class="sub"><a href="#s5-10">5.10 Clocks &amp; time zones</a></li>
+    <li class="sub"><a href="#s5-11">5.11 Feed health</a></li>
+    <li><a href="#s6"><span class="n">6</span>Filters</a></li>
+    <li><a href="#s7"><span class="n">7</span>Alarms</a></li>
+    <li><a href="#s8"><span class="n">8</span>The Settings window</a></li>
+    <li><a href="#s9"><span class="n">9</span>Running it on a server</a></li>
+    <li class="sub"><a href="#s9-1">9.1 The Windows service</a></li>
+    <li class="sub"><a href="#s9-2">9.2 Admin: SFTP receiver</a></li>
+    <li class="sub"><a href="#s9-3">9.3 Remote access (HTTPS)</a></li>
+    <li class="sub"><a href="#s9-4">9.4 Detailed SFTP logging</a></li>
+    <li><a href="#s10"><span class="n">10</span>Reports &amp; exports</a></li>
+    <li><a href="#s11"><span class="n">11</span>Command reference</a></li>
+    <li><a href="#s12"><span class="n">12</span>Troubleshooting</a></li>
+    <li><a href="#s13"><span class="n">13</span>How it works &amp; limits</a></li>
+    <li><a href="#a1"><span class="n">A</span>Number rules</a></li>
+    <li><a href="#a2"><span class="n">B</span>Files it keeps</a></li>
+    <li><a href="#a3"><span class="n">C</span>Release causes</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="mast">
+  <p class="eyebrow">Operator's manual · version 1.2</p>
+  <h1>Cube<span>Scope</span></h1>
+  <p class="dek">A dashboard for the call records a Cisco CUBE writes. It puts each call's legs back together and shows how calls ended, who hung up, how the audio fared, and whether the records themselves are going missing on the way.</p>
+  <div class="meta">
+    <span>Cisco CUBE · IOS XE · gw-accounting syslog and file</span>
+    <span>Single exe · .NET Framework 4.x · no install</span>
+    <span>No database, no internet: the exe serves its own page</span>
+  </div>
+</header>
+
+<!-- ============================================================ 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>What it is</h2>
+  <p>A CUBE with accounting turned on writes one record for every call leg when that leg ends. It accounts <strong>each direction separately</strong>: the leg it answered from one side and the leg it placed to the other, and more legs for transfers and calls that loop back through it. On their own those records are hard to read. CubeScope reads them, joins the legs of each call back into one call, and shows what they say:</p>
+  <ul>
+    <li><strong>How calls ended</strong>, per minute, hour or day: answered, canceled while ringing, no answer, busy, rejected, failed.</li>
+    <li><strong>Who hung up</strong> (the side whose leg disconnected first) and the cause that decided each call, in words.</li>
+    <li><strong>Timings</strong>: ring time, talk time, and on dialer calls the gap between the customer answering and the agent side picking up.</li>
+    <li><strong>Concurrent calls and legs</strong>, which is what the CUBE's licence counts.</li>
+    <li><strong>Audio problems</strong> from the packet counts: no audio, one-way audio, a low packet rate. With the CUBE's quality figures turned on, MOS (the estimated voice quality score, 1 to 5), jitter and packet loss per leg.</li>
+    <li><strong>Calls the records never show</strong>: calls the CUBE refused before placing any leg. Those are known only from its internal error message and its call-failure trace, which CubeScope keeps with the SIP INVITE inside it.</li>
+    <li><strong>Everything else the CUBE sends</strong>: TLS failures, logins, configuration changes, licence messages.</li>
+    <li><strong>Feed health</strong>: messages lost between the CUBE and the server, and legs whose records are incomplete.</li>
+  </ul>
+  <div class="cols">
+    <div class="card"><h4>Reads what the CUBE already sends</h4><p>The hourly files a syslog server writes, the call record files the CUBE uploads over SFTP, or both. Nothing is installed on the CUBE and nothing polls it.</p></div>
+    <div class="card"><h4>Every call opens to its evidence</h4><p>Click a call for its legs, timeline, dial-peers, causes in words, quality figures, failure trace and the raw log lines it was built from.</p></div>
+    <div class="card"><h4>Always on, if you want it</h4><p>As a Windows service it keeps the newest day, raises alarms to the event log and SNMP traps, deletes old files and lets other computers in over HTTPS after a Windows sign-in.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>Install and build</h2>
+  <p>There is nothing to install. <code>CubeScope.exe</code> is one file that needs only the .NET Framework 4.x every supported Windows Server already has. Copy it to the syslog server, the SFTP server or a workstation that can read their folders, and run it.</p>
+  <p>To build it from source, run <code>build.bat</code> in the project folder. It uses the C# compiler that ships with Windows (<code>%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe</code>), so it builds on a locked-down server too. <code>build.bat test</code> builds it and runs the built-in self-test, which must report no failures:</p>
+<pre>build.bat test
+  bin\CubeScope.exe
+
+CubeScope 1.2 self-test
+  1697 passed, 0 failed</pre>
+  <p class="small">The dashboard page is built into the exe. It loads no web fonts and nothing from the internet, so it works on a server with no route out. This manual is the same: open <code>manual.html</code> straight from the folder.</p>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>Quick start</h2>
+  <div class="note">
+    <b class="t">The quickest way: double-click it</b>
+    <p>Double-click <code>CubeScope.exe</code> and a folder window opens. Pick the folder your syslog server writes the CUBE's files to, or the folder above several CUBEs' folders. CubeScope reads them, opens the dashboard in your browser on <code>http://localhost:8792/</code> and keeps following new records. Keep the console window open while you use the dashboard; closing it stops CubeScope.</p>
+  </div>
+  <p>From a command prompt, the same in steps:</p>
+  <ol class="steps">
+    <li><strong>Check what it finds.</strong> A summary on the console reads the files once and prints a table per day: calls, results, causes, media problems and missing messages. If it says it found no call records, see <a href="#s4">§4</a>.
+<pre>CubeScope.exe --logs D:\Syslog\192.0.2.10 --summary</pre></li>
+    <li><strong>Serve the dashboard.</strong> Add <code>--serve</code>, and <code>--open</code> to open the browser. A folder holding one folder per CUBE gives you every CUBE, with a picker for one.
+<pre>CubeScope.exe --logs D:\Syslog --serve --open</pre></li>
+    <li><strong>Open it.</strong> <code>http://localhost:8792/</code> on the same computer. For other computers, see <a href="#s9-3">§9.3</a>.</li>
+  </ol>
+  <div class="note">
+    <b class="t">What the CUBE needs</b>
+    <p>For syslog, two lines in its configuration: <code>gw-accounting syslog</code> (write a record per leg) and <code>logging host &lt;syslog server&gt;</code> (send them). Without the first, the files hold the CUBE's other messages but no calls. For call record files, see <a href="#s4-2">§4.2</a>.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>Getting the records in</h2>
+  <p>A CUBE can send its call records two ways. CubeScope reads either one, or both from the same CUBE at once, and treats a call the same whichever way it arrived.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Feed</th><th>On the CUBE</th><th>What it gives</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Syslog</td><td><code>gw-accounting syslog</code> and <code>logging host</code></td><td>Every leg's record and its numbers, transfers and forwards; internal errors and call-failure traces; configuration changes, logins and other events; numbered messages, so lost ones can be counted.</td></tr>
+      <tr><td class="k">Syslog with figures</td><td><code>gw-accounting syslog stats</code> and <code>logging trap debugging</code></td><td>The above plus a statistics block per leg: MOS, jitter, late and early packets.</td></tr>
+      <tr><td class="k">Call record files</td><td><code>gw-accounting file</code>, uploaded over SFTP or written to flash</td><td>One row per leg with Cisco's 133 columns: dial-peer, far-end media address, codec, the number as received and as sent, time to ringing, and the quality figures.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s4-1"><span class="n">4.1</span>Syslog files</h3>
+  <p>Most syslog servers write one file per device per hour. CubeScope expects names like <code>&lt;name&gt;-yyyy-mm-dd-hh.log</code>, where the name is usually the CUBE's address. Other names work too and are grouped by folder. It looks two folder levels down, so a folder holding one folder per CUBE works.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th>Default</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="m">--days &lt;n&gt;</td><td class="m">14</td><td>Read the newest n days. <code>--all</code> reads every file.</td></tr>
+      <tr><td class="m">--from &lt;t&gt; --to &lt;t&gt;</td><td></td><td>A range, as <code>2026-09-28</code> or <code>2026-09-28T14:00</code>, on the CUBE's clock (or the one <code>--zone</code> names).</td></tr>
+      <tr><td class="m">--cube &lt;name&gt;</td><td>every CUBE</td><td>Only the CUBE whose files start with this name. Repeat it for several. Useful when routers and switches log into the same folder.</td></tr>
+      <tr><td class="m">--pattern &lt;glob&gt;</td><td class="m">*.log</td><td>Which file names to read.</td></tr>
+      <tr><td class="m">--threads &lt;n&gt;</td><td>processors, at most 8</td><td>How many files are read at once.</td></tr>
+    </tbody>
+  </table></div>
+  <p>While serving, CubeScope keeps following the newest file of each CUBE and picks up new hours as they appear. <code>--no-live</code> reads once and stops.</p>
+  <p class="small">The CUBE writes a record when a leg disconnects. A call that is still up is not in the files and does not appear until it ends.</p>
+
+  <h3 id="s4-2"><span class="n">4.2</span>Call record files</h3>
+  <p>With <code>gw-accounting file</code> the CUBE writes its records to files named <code>cdr.&lt;hostname&gt;.&lt;MM_dd_yyyy_HH_mm_ss.mmm&gt;</code> and uploads them over SFTP (or keeps them on flash). Point <code>--logs</code> at the folder they land in, alone or beside syslog files. New files are picked up about every 10 seconds. To set a Windows server up to receive them, use the Admin page (<a href="#s9-2">§9.2</a>).</p>
+  <ul>
+    <li><strong>What they add.</strong> Tables by dial-peer, far-end media address and codec; Find pickers for dial-peer and codec; time to ringing; each number as received and as sent; every column by Cisco's name on a call; the same columns in the CSV; alarms on a dial-peer or a far-end address.</li>
+    <li><strong>Quality.</strong> The quality columns are all zero unless the CUBE has <code>media statistics</code>, <code>media bulk-stats</code>, <code>media stats-disconnect</code> and <code>call-quality</code> under <code>voice service voip</code>. MOS and round trip also need RTCP (the far end's quality reports) from the far end. A call's detail then shows a <em>Call quality</em> table per leg, and the <em>Ringing and call quality</em> panel totals calls measured and calls rated poor (MOS under 3.5 or loss above 1%).</li>
+    <li><strong>Many small files.</strong> Over SFTP a busy CUBE can start a new file every few seconds. That is expected; CubeScope reads them by name without listing the whole folder each time.</li>
+    <li><strong>Old files.</strong> <em>Settings</em> deletes call record files older than a number of days you choose (<a href="#s8">§8</a>).</li>
+  </ul>
+
+  <h3 id="s4-3"><span class="n">4.3</span>One CUBE sending both</h3>
+  <p>Run both feeds and CubeScope shows one CUBE, not two. Syslog files are named by address and call record files by host name, and nothing in either names the other, so CubeScope pairs them by the calls they share.</p>
+  <ul>
+    <li><strong>How it knows.</strong> At least three legs must match exactly in both feeds: the same call ID, the same times to the millisecond and the same packet counts. If nothing matches, or the feeds cover different hours, they stay separate. Once paired, a leg counts as the same in both if its times are within 50 ms, because a real CUBE's two feeds differ by up to 10 ms.</li>
+    <li><strong>What you get.</strong> Each leg once, under the host name, with what each feed adds: dial-peer, media address, codec and numbers from the files; jitter and MOS from syslog. A leg found in only one feed is kept. The call list's <em>Data</em> column shows which feeds each call came from.</li>
+    <li><strong>Where to see it.</strong> <em>Feed health</em> shows the address the syslog arrives from and how many legs were in both feeds, syslog only and files only. <em>Files only</em> legs are records syslog lost; <em>syslog only</em> legs are records the file upload lost.</li>
+    <li><strong>It remembers</strong> the pair in <code>cube-links.json</code> in the data folder. If an address is later given to a different CUBE, delete that file. A feed turned on while CubeScope runs joins within about five minutes.</li>
+  </ul>
+
+  <h3 id="s4-4"><span class="n">4.4</span>Files from flash, fetched every few minutes</h3>
+  <p>If SFTP uploads lose records (<a href="#s4-5">§4.5</a>), let the CUBE write its call record files to its own flash and fetch them with <code>tools\Fetch-CubeFlashCdr.ps1</code>, run as a scheduled task on the SFTP server. Each run logs in to the CUBE over SSH with a key, has it finish the file it is writing (<code>file-acct flush with-close</code>), and has the CUBE copy each finished file to this server as <code>&lt;name&gt;.part</code>. The script checks the size, gives the file its real name (CubeScope then reads it) and only then deletes it from flash. A file that does not arrive whole stays on flash for the next run. The newest file is never touched.</p>
+  <ol class="steps">
+    <li>In an administrator PowerShell on the SFTP server: <code>.\Fetch-CubeFlashCdr.ps1 -Cube 192.0.2.10 -SftpServer 192.0.2.50 -Setup</code>. It makes this server's SSH key (readable by administrators and SYSTEM only) and prints the CUBE configuration to paste: an account that logs in with that key, the SFTP login the CUBE uses for <code>copy</code>, <code>file prompt quiet</code>, and <code>gw-accounting file</code> writing to <code>bootflash:cdr</code>.</li>
+    <li><code>-DryRun</code> logs in, lists what it would move and changes nothing. Repeat until it lists the files.</li>
+    <li><code>-EveryMinutes 5 -Install</code> adds the task "CubeScope flash fetch", run as SYSTEM. <code>-Uninstall</code> removes it.</li>
+  </ol>
+  <ul>
+    <li><strong>How often.</strong> Left alone the CUBE closes a flash file only after its file-close timer, at least 60 minutes. With the script a file is finished every run: 5 minutes is the suggestion, 1 minute works. Each run is a few SSH logins.</li>
+    <li><strong>Folder and port</strong> come from this server's OpenSSH settings for the SFTP account (as the Admin page writes them), or from <code>-Folder</code> and <code>-SftpPort</code>. <code>-SshOption 'PubkeyAcceptedAlgorithms=+ssh-rsa;HostKeyAlgorithms=+ssh-rsa'</code> is for a CUBE that offers only the older RSA signatures.</li>
+    <li><strong>Its log</strong> is <code>%ProgramData%\CubeScope\FlashFetch\logs\flash-fetch.log</code> (five files of 2 MB at most): each run, each file with its size, and why a file stayed on flash.</li>
+  </ul>
+  <div class="note warn">
+    <b class="t">Not yet run against a real CUBE</b>
+    <p><code>-SelfTest</code> runs the whole move against a pretend CUBE. Logging in with a key, <code>copy</code> started over SSH, and whether forcing a file closed loses records are still to be seen on a real one. Compare an hour of fetched files with syslog before relying on it.</p>
+  </div>
+
+  <h3 id="s4-5"><span class="n">4.5</span>Known problem: SFTP uploads can lose records</h3>
+  <p>On one customer's CUBE (a C8000V on IOS XE 17.12.4b, uploading to Windows OpenSSH), CubeScope and the CUBE's own debug output showed this:</p>
+  <ul>
+    <li>Each upload wrote a file and then failed when the CUBE tried to add the records that had arrived meanwhile. The CUBE logged <code>%VOICE_FILE_ACCT-3-DUMPFAIL</code> and retried into a new file, so a busy CUBE leaves many small files.</li>
+    <li>Records that arrived during the retry were lost: in every case checked. The CUBE also dropped some on its own, logging <code>file_acct buffer full. Drop msg</code>.</li>
+    <li>The Windows server was not at fault: it accepted everything it was sent. Writing to flash instead lost nothing in an hour of comparison with syslog.</li>
+    <li>Changing <code>maximum buffer-size</code> did not stop it. Cisco lists two related defects (CSCwn19326, CSCwn13988) as fixed in 17.12.5a; that release was not tried.</li>
+  </ul>
+  <div class="note">
+    <b class="t">What to do</b>
+    <p>Keep syslog accounting on beside the files: CubeScope fills the files' gaps from it, and <em>Feed health</em> counts the legs each feed missed. Or write the files to flash and fetch them (<a href="#s4-4">§4.4</a>). To see the upload itself fail, use the Admin page's detailed SFTP logging (<a href="#s9-4">§9.4</a>).</p>
+  </div>
+
+  <h3 id="s4-6"><span class="n">4.6</span>CUBE settings that help</h3>
+  <p>None of these is required.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Setting</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="m">service timestamps log datetime msec localtime show-timezone year</td><td>The message header then carries the year and the time zone. Without the zone the clock check still measures the CUBE's offset, but the server's zone has to come from another CUBE or <code>--server-zone</code>.</td></tr>
+      <tr><td class="m">clock summer-time &lt;zone&gt; recurring, and NTP</td><td>Where the site has daylight-saving time. The clock panel shows what goes wrong without them.</td></tr>
+      <tr><td class="m">logging host &lt;server&gt; transport tcp</td><td>Syslog over UDP loses messages under load; <em>Feed health</em> counts how many.</td></tr>
+      <tr><td class="m">voice iec syslog, and the call-failure trace</td><td>For an INVITE the CUBE refuses before any leg exists, these are the only record.</td></tr>
+      <tr><td class="m">archive / log config / logging enable</td><td>Configuration changes then show the commands typed, not only "Configured from console".</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn">
+    <b class="t">logging trap debugging sends everything</b>
+    <p>The per-leg statistics blocks are sent at debug level, so they reach the server only with <code>logging trap debugging</code>. At the default level the call records still arrive, with no figures and no warning. The same setting also sends any <code>debug</code> left running, so check <code>show debug</code> first.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>Reading the dashboard</h2>
+  <div class="note">
+    <b class="t">Hover anything</b>
+    <p>Every tile, chart, column heading, picker and button has a description of what it shows and how it is worked out. Hover it. This chapter is the overview; the hover text is the detail.</p>
+  </div>
+  <p>The page reads top to bottom: the top bar, the tiles, the charts, the tables, the list of calls, then the clock check and feed health at the bottom. Everything below the top bar follows the range and the filter.</p>
+
+  <h3 id="s5-1"><span class="n">5.1</span>The top bar</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Range</td><td><em>Last hour</em>, <em>Last 24 h</em>, <em>Last day</em>, <em>Day before</em>, <em>7 days</em>, <em>All</em>. Ranges count back from the newest record, not from this computer's clock, so an old archive opens on its own last day. While following new records they end at the current time.</td></tr>
+      <tr><td class="k">From / to, Show</td><td>A range typed in.</td></tr>
+      <tr><td class="k">Points every</td><td>How much time each point on a chart covers: 1 minute to 1 day, or <em>auto</em> to fit the range.</td></tr>
+      <tr><td class="k">Times in</td><td>Puts every time on one clock: each CUBE's own (the default), the syslog server's, UTC or a US zone. CUBEs in different zones then line up. Charts, tiles, lists, CSV and Report all follow it; a call's detail keeps the CUBE's clock and adds the page's.</td></tr>
+      <tr><td class="k">CUBE</td><td>One CUBE, or all. Shown when there is more than one.</td></tr>
+      <tr><td class="k">Live</td><td>Re-reads every five seconds. On by itself while CubeScope follows new records; pressing it turns it off or on, and the choice is kept in this browser. Last hour, Last 24 h and 7 days move forward on their own; a zoomed or typed range stays put.</td></tr>
+      <tr><td class="k">CSV, Report</td><td>Every matching call as a spreadsheet file, or this page as one HTML file (<a href="#s10">§10</a>).</td></tr>
+      <tr><td class="k">Alarms, Settings, Admin</td><td>The alarm rules (<a href="#s7">§7</a>), retention and how this CubeScope was started (<a href="#s8">§8</a>), and setting the server up (<a href="#s9-2">§9.2</a>; on the server only).</td></tr>
+      <tr><td class="k">Theme</td><td>Light or dark.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s5-2"><span class="n">5.2</span>Filter, recent filters and Find</h3>
+  <p>The filter box takes clauses such as <code>called=251* result=unanswered</code>; the full list is in <a href="#s6">§6</a>. A number on its own searches every number on the call. <em>Apply</em> uses it; <em>Clear</em> empties it. A filter with a mistake shows the error beside the box and changes nothing.</p>
+  <p><strong>Recent filters</strong> (beside Clear) lists the last 15 filters used in this browser, including ones written by the pickers and by chart clicks. They also come up as suggestions while you type. <em>Forget these</em> empties the list.</p>
+  <p><strong>Find</strong>, under the filter box, writes the clause for you. Each picker shows counts over the whole range, so the other choices stay listed after you pick one.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Picker</th><th>Picks calls by</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Cause</td><td>The cause that decided the call, or a cause on any leg. The list starts with <em>caller hung up while ringing</em> and <em>dialer gave up while ringing</em>, because a hang-up while ringing carries cause 16 like a normal end of call.</td></tr>
+      <tr><td class="k">Audio</td><td>No media, one-way, low packet rate, or any of them.</td></tr>
+      <tr><td class="k">Result</td><td>How the call ended.</td></tr>
+      <tr><td class="k">Released by</td><td>Caller, called, network, or both at once (<code>tie</code>).</td></tr>
+      <tr><td class="k">Talk</td><td>Talk-time bands such as under 5 s or under 30 s.</td></tr>
+      <tr><td class="k">Dial-peer, Codec</td><td>Shown only when call record files are read.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s5-3"><span class="n">5.3</span>Tiles</h3>
+  <p>The tiles total the range. <strong>Click a tile</strong> to show only those calls; click it again to drop it.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Tile</th><th>Counts</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Calls</td><td>Calls that started in the range and pass the filter. A call is everything the CUBE logged under one call ID, including calls it refused before placing a leg.</td></tr>
+      <tr><td class="k">Answered</td><td>Calls where a leg the CUBE placed was answered, as a share of all calls.</td></tr>
+      <tr><td class="k">Avg talk</td><td>Mean talk time of answered calls, with the median and 95th percentile below.</td></tr>
+      <tr><td class="k">Canceled while ringing</td><td>Stopped before anyone answered. On a dialer call that is the dialer giving up, not a customer.</td></tr>
+      <tr><td class="k">No answer</td><td>The far end came back with cause 18, 19 or 20.</td></tr>
+      <tr><td class="k">Busy</td><td>Cause 17.</td></tr>
+      <tr><td class="k">Rejected</td><td>Refused by the far end or the CUBE: causes 1, 21, 22 and 28, and INVITEs that matched no dial-peer.</td></tr>
+      <tr><td class="k">Failed</td><td>Any other cause on an unanswered call: 38, 41, 47, 102 and the rest. The network's or the CUBE's failures rather than a person's choice.</td></tr>
+      <tr><td class="k">No / one-way media</td><td>Answered calls where a leg that talked over 5 seconds had no packets, or packets one way only. Also as a share of answered calls.</td></tr>
+      <tr><td class="k">Low packet rate</td><td>A talking leg ran under half of the 50 packets a second that 20 ms audio sends. Hold with no music shows here too.</td></tr>
+      <tr><td class="k">Transfers</td><td>Blind transfers (SIP REFER), once per transfer.</td></tr>
+      <tr><td class="k">Answer to transfer</td><td>Median time from the first answer to the transfer target answering: on a dialer call, customer answers to agent side picks up.</td></tr>
+      <tr><td class="k">Peak concurrent</td><td>The most calls up at once, and below it the most legs at once (closer to what the licence counts).</td></tr>
+      <tr><td class="k">Released by caller</td><td>Who started the teardown of answered calls.</td></tr>
+      <tr><td class="k">Messages missing</td><td>Messages the CUBE numbered that never reached the files (<a href="#s5-11">§5.11</a>).</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s5-4"><span class="n">5.4</span>Charts</h3>
+  <p><em>Calls by result</em>, <em>Answered</em>, <em>Concurrent</em>, <em>Ring time</em>, <em>Talk time</em>, <em>Not answered, by cause</em>, <em>Media problems</em>, <em>Transfers</em> and <em>Answer to transfer connect</em> plot the range over time. Media problems are also shown as a share of answered calls, because audio is only judged on answered calls.</p>
+  <ul>
+    <li><strong>Drag across a chart to zoom</strong> to that stretch; <em>Back</em> returns. Only a drag changes the time range. A single click never does.</li>
+    <li><strong>Click a coloured band</strong> (on Calls by result, Not answered by cause, Media problems and Transfers) to keep only that band's calls over the same range. The band's clause goes into the filter, such as <code>result=abandoned</code> or <code>result=unanswered cause=20</code>, replacing any clause on the same field. Click the band again to take it off. Hovering says which band a click would take.</li>
+    <li><strong>Click a legend entry</strong> to hide that series. Hiding Answered lets the failures use the whole height.</li>
+  </ul>
+
+  <h3 id="s5-5"><span class="n">5.5</span>Tables</h3>
+  <ul>
+    <li><strong>Top called numbers, Top calling numbers, Top connected-to</strong>: each count with its share in grey (calls against every call in the range; not answered against that number's calls; bad audio against its answered calls). The last row adds up the rows listed. <strong>Click a number</strong> to filter the page to it.</li>
+    <li><strong>Causes</strong>: every deciding cause with its name. Click a row to filter by it.</li>
+    <li><strong>By dial-peer, By far-end media address, By codec</strong>: shown only when call record files are read.</li>
+    <li><strong>Ringing and call quality</strong>: time to ringing, and calls measured and rated poor, when the CUBE sends figures.</li>
+  </ul>
+
+  <h3 id="s5-6"><span class="n">5.6</span>Canceled while ringing</h3>
+  <p>Calls stopped before anyone answered. On a dialer call the dialer stopped it; on any other call the caller hung up. A bar chart has one bar per second the call ran before the cancel, from 0 to 120 seconds or more, with the dialer and callers in different colours. The table lists the <strong>piles</strong>: runs of seconds that each hold at least 1% of that side's cancels and at least 3 calls.</p>
+  <p>People hang up at scattered times, so a tall narrow pile is a machine's timer, such as a dialer campaign's no-answer timeout. Click a bar or a count to list those calls; the filter shows the clauses used, for example <code>result=dialercanceled dur&gt;=9 dur&lt;11</code>. <code>--summary</code> prints the same piles.</p>
+
+  <h3 id="s5-7"><span class="n">5.7</span>Events and configuration changes</h3>
+  <p>The <em>Events</em> lanes show everything the CUBE sent that is not a call record, over the range: internal errors, call-failure traces, TLS failures, logins, configuration changes, licence messages and the rest. Hover a mark for the message.</p>
+  <p>Below it are the <strong>last 10 configuration changes</strong>, from any time, not only the range shown: of all CUBEs or of the one picked. With <code>archive log config</code> on the CUBE they include the commands typed. The service keeps them in <code>config-history.json</code>, so they stay listed after its 24-hour window has moved on and after a restart.</p>
+
+  <h3 id="s5-8"><span class="n">5.8</span>The call list</h3>
+  <p>One row per call: start, duration, ring, talk, calling, called, connected-to, legs, result, released by, deciding cause, media, data, transfers and tags. Sort by any column. Click a number to filter by it; click the row for the call's detail.</p>
+  <ul>
+    <li><strong>Called</strong> is what the CUBE dialled on its first outbound leg, after its own number translation. <strong>Connected</strong> is the far end of the last leg to answer when that is not the number dialled, such as an agent's extension behind a routing label.</li>
+    <li><strong>Released by</strong> is the far end whose leg disconnected first. <em>Network</em> means that leg's cause was a failure such as 41, 47 or 102.</li>
+    <li><strong>Data</strong> says where the call's details came from: <span class="pill">Syslog</span> (the accounting messages), <span class="pill">SFTP</span> (the call record files) and <span class="pill">Media</span> (the CUBE sent media figures, even all zero). A dim label, like <span class="pill dim">SFTP</span>, means that source said nothing about the call; on a CUBE sending both feeds, that is a lost record.</li>
+    <li><strong>Media</strong> shows the worst audio on a talking leg. On <em>low rate</em> and <em>one-way</em> it adds the packets a second sent and received on the leg that decided it (normal 20 ms audio is 50 a second each way). Hover for which leg.</li>
+  </ul>
+
+  <h3 id="s5-9"><span class="n">5.9</span>One call's detail</h3>
+  <p>Click a call. The detail opens over the page, on the CUBE's own clock with the page's clock alongside:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Part</th><th>Shows</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Top lines</td><td>Result, who released, the deciding cause in words (<em>16 Normal call clearing</em>), the data sources, and each leg's <strong>dial-peer</strong> (in 100 → out 200; only call record files carry dial-peers).</td></tr>
+      <tr><td class="k">Same called number</td><td>How other calls to this called number fared in the range: how many, the share that failed (rejected or failed), answered and the rest; on this CUBE too when there are several. <em>List them</em> filters the page to that number.</td></tr>
+      <tr><td class="k">Timeline</td><td>Each leg's setup, answer and disconnect on one time line.</td></tr>
+      <tr><td class="k">Legs</td><td>Per leg: direction, setup, answer and disconnect times, ring and talk, far end, dial-peer, calling and called numbers, cause in words, packets sent and received, and how the audio was judged.</td></tr>
+      <tr><td class="k">From the CUBE's call record</td><td>Per leg: dial-peer, codec, far-end media address, time to ringing, the numbers as received and as sent, the signalling, and the disconnect in the CUBE's own words. <em>Every column</em> opens all 133 columns by Cisco's name, with causes and hexadecimal codes turned into words. Only for calls read from files.</td></tr>
+      <tr><td class="k">Call quality</td><td>Per leg, as the CUBE measured it: MOS, packet loss, out of order, lost, late and early packets, jitter, round trip, receive delay and ICPIF (Cisco's impairment score, lower is better).</td></tr>
+      <tr><td class="k">Features</td><td>Transfers, forwards and the numbers record of each leg.</td></tr>
+      <tr><td class="k">Internal errors</td><td>The CUBE's internal error messages for the call and its call-failure trace, including the SIP INVITE it refused.</td></tr>
+      <tr><td class="k">Raw log lines</td><td>The lines the call was built from, read back from the files on demand.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s5-10"><span class="n">5.10</span>Clocks and time zones</h3>
+  <p>Compares each CUBE's clock with the syslog server's. The server names each file by its own hour, so the times inside show how far ahead or behind a CUBE is. Whole hours are a time-zone difference; anything left over is a wrong clock, red when proven. A busy CUBE is pinned to within a second or two.</p>
+  <p>It also says which zone label the CUBE prints, whether the label matches its clock, summer-time mistakes (a winter label printed in July), and messages IOS marked <code>*</code> (clock never set) or <code>.</code> (NTP not in step). The server's zone is worked out from the CUBEs' labels, or set with <code>--server-zone "Mountain Standard Time"</code> (or <code>UTC-6</code>).</p>
+
+  <h3 id="s5-11"><span class="n">5.11</span>Feed health</h3>
+  <p>How complete each CUBE's records are:</p>
+  <ul>
+    <li><strong>Messages missing.</strong> IOS numbers every message it sends. A gap in the numbers is a message that never reached the file: lost in transit (syslog over UDP), or below the logging level. A lost call record shows up as a leg without its numbers record, or a numbers record with no leg.</li>
+    <li><strong>Both feeds.</strong> The address syslog arrives from, and legs found in both feeds, syslog only and files only (<a href="#s4-3">§4.3</a>).</li>
+    <li><strong>Lines not used.</strong> Debug text outside failure traces, counted and skipped.</li>
+  </ul>
+  <p>The note under it lists the number rules in use (<a href="#a1">Appendix A</a>).</p>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>Filters</h2>
+  <p>The same filter works in the page's filter box, in <code>--filter</code> on the command line and in <code>--trace</code>. Clauses separated by spaces must all hold; commas give alternatives; a <code>!</code> in front reverses a clause.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Clause</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="m">called=251<br>calling= connected= dialed= peer= any=</td><td>Starts with 251. <code>251*</code> and <code>?</code> are wildcards, <code>"2515550100"</code> is exact, <code>re:</code> starts a regular expression. A bare number means <code>any=</code>.</td></tr>
+      <tr><td class="m">result=answered|canceled|noanswer|busy|<br>rejected|failed|unanswered</td><td>How the call ended. <code>canceled</code> (also <code>abandoned</code>) is stopped while ringing, split into <code>callercanceled</code> and <code>dialercanceled</code>. <code>unanswered</code> is everything not answered.</td></tr>
+      <tr><td class="m">legfail=251</td><td>An outbound leg to this number that nobody answered, even on a call that reads as answered.</td></tr>
+      <tr><td class="m">cause=17,21 · legcause=47</td><td>The deciding cause · a cause on any leg.</td></tr>
+      <tr><td class="m">released=caller|called|network|tie</td><td>Who started the teardown.</td></tr>
+      <tr><td class="m">media=none|oneway|lowrate|twoway|bad|problem</td><td>The worst audio on a talking leg. <code>bad</code> is none or one-way; <code>problem</code> is any of the three. <code>audio=</code> is the same.</td></tr>
+      <tr><td class="m">talk&gt;=30 ring&lt;5 dur&gt;600 a2t&gt;3<br>legs&gt;=3 transfers&gt;=1 codec=210</td><td>Numbers, in seconds where they are times. <code>a2t</code> is answer to transfer connect; <code>codec=</code> a number is bytes per packet.</td></tr>
+      <tr><td class="m">tag=dialer · src=&lt;cube&gt; · guid=</td><td>A number-rule label · one CUBE · a call ID in any of its spellings.</td></tr>
+      <tr><td class="m">has=dump|iec|transfer|cfa|stub|unbound|dialer</td><td>Calls with a failure trace, an internal error, a transfer, a forward, a leg missing its numbers record, a numbers record missing its leg, or a dialer leg first.</td></tr>
+    </tbody>
+  </table></div>
+  <p>With call record files read, or with the syslog figures:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Clause</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="m">dialpeer=20</td><td>A leg on dial-peer 20.</td></tr>
+      <tr><td class="m">mediaip=192.0.2.* · mediaport&gt;=16384</td><td>The far end's media address or port.</td></tr>
+      <tr><td class="m">codec=g711ulaw</td><td>By the codec's name.</td></tr>
+      <tr><td class="m">alert&gt;5</td><td>Seconds until ringing.</td></tr>
+      <tr><td class="m">received= · sent=</td><td>A number before and after the CUBE's translation (<code>any=</code> searches these too).</td></tr>
+      <tr><td class="m">mos&lt;3.5 · loss&gt;1 · lost&gt;0 · rtt&gt;150</td><td>Quality figures. A leg the CUBE did not measure never matches, so <code>mos&lt;3.5</code> does not pick up zeros.</td></tr>
+    </tbody>
+  </table></div>
+  <p>These are true when any leg of the call matches. Examples:</p>
+<pre>result=unanswered cause=41,102           <span class="c">failures on the network side</span>
+called=800* media=bad                    <span class="c">bad audio on calls to 800 numbers</span>
+!released=caller talk&lt;10 result=answered <span class="c">short answered calls the caller did not end</span>
+has=iec                                  <span class="c">calls the CUBE refused with an internal error</span></pre>
+</section>
+
+<!-- ============================================================ 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>Alarms</h2>
+  <p>Press <strong>Alarms</strong> in the top bar. Alarms run in the CubeScope service (<a href="#s9-1">§9.1</a>), or in a CubeScope started with <code>--alarms</code>. Each alarm is sent <strong>once</strong> when the condition starts and its clear once when it ends, never repeated while it lasts.</p>
+
+  <h3>What to watch</h3>
+  <p>One row per thing to watch. <strong>Watch</strong> says which calls count; the number can match exactly, by its start or by its end.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Watch</th><th>Calls counted</th><th>Judged by</th></tr></thead>
+    <tbody>
+      <tr><td class="k">called</td><td>Calls whose first outbound number is this.</td><td>The whole call</td></tr>
+      <tr><td class="k">dialed</td><td>Calls that arrived with this number.</td><td>The whole call</td></tr>
+      <tr><td class="k">connected</td><td>Calls first sent somewhere else, then transferred to this number. A transfer nobody answered counts as failed, though the call reads as answered.</td><td>The leg to this number</td></tr>
+      <tr><td class="k">any leg</td><td>Called and connected together: every call with a leg to this number.</td><td>That leg</td></tr>
+      <tr><td class="k">dial-peer</td><td>Calls with a leg on this dial-peer. Needs call record files.</td><td>The whole call</td></tr>
+      <tr><td class="k">far-end address</td><td>Calls whose far end sent audio from this address, such as a carrier's or CUCM's media address. <em>Starts with</em> <code>192.0.2.</code> takes a whole range. Needs call record files.</td><td>The whole call</td></tr>
+      <tr><td class="k">every call on the CUBE</td><td>The CUBE as a whole; nothing to type.</td><td>The whole call</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><strong>CUBEs</strong>: tick the ones to judge; none ticked means every CUBE. Each CUBE is judged on its own.</li>
+    <li><strong>Over %</strong> (default 1), <strong>Window</strong> (60 minutes), <strong>Min calls</strong> (50), <strong>Min failures</strong> (2). An alarm needs more than the limit, at least the minimum calls in the window and at least the minimum failures. One stray failure in a quiet hour is not an alarm, and a standby CUBE with no calls never is.</li>
+    <li><strong>Counts as failed</strong>: rejected and failed by default; busy, no answer and canceled while ringing can be added. <strong>Canceled counts after N s</strong> (0 = every cancel) leaves out callers who hang up at once while catching a far end that never answers. It is measured from setup, because the records do not say when ringing began.</li>
+    <li><strong>Note on the alarm</strong>: your own words for whoever receives it (who to call, which runbook), sent with the alarm and its clear.</li>
+  </ul>
+
+  <h3>How to raise it</h3>
+  <p><em>Alarms on</em>, <em>check every N minutes</em>, then the Windows Application log (Error or Warning), SNMP traps (one or more management stations, port, community, trap OID), or both. CubeScope builds and sends the trap itself over UDP (SNMPv2c), so the Windows SNMP service is not needed. The trap OID defaults to the placeholder <code>1.3.6.1.4.1.9999.1.3000</code>; set your own.</p>
+  <p><strong>No call records for N minutes</strong> raises an alarm per CUBE, and per feed on a CUBE sending both, when its call records stop. Set it longer than the quietest stretch: a record is written only when a call ends, and files arrive in batches. A CUBE that loses its SFTP server writes to flash and stays there until someone runs <code>file-acct reset</code> on it. Only real call records count, so a CUBE still sending other messages does alarm. A source is watched once a call record has been read from it; a stray log or a router in the same folder raises nothing.</p>
+  <p><strong>Test alarm</strong> sends event 1000 plus a test alarm trap and, ten seconds later, its clear, on CUBE "TEST", so a test never closes a real alarm.</p>
+
+  <h3>What it sends</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Event</th><th>Trap OID</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td class="k">1001 <span class="tag crit">Error</span></td><td class="m">&lt;OID&gt;.1001</td><td>A CUBE goes over the limit for a rule: "Greater than 1% call failures to DNIS 5550100 on &lt;CUBE&gt;" (or to dial-peer 100, to far end 192.0.2.*, to all calls). Can be set to Warning.</td></tr>
+      <tr><td class="k">1002 <span class="tag ok">Info</span></td><td class="m">&lt;OID&gt;.1002</td><td>Back under the limit, too few calls left to judge, the rule removed, or alarms turned off.</td></tr>
+      <tr><td class="k">1003 <span class="tag warn">Warning</span></td><td class="m">&lt;OID&gt;.1003</td><td>Cannot check: a CUBE named in a rule is not in the files, or no call records arrive at all.</td></tr>
+      <tr><td class="k">1004 <span class="tag ok">Info</span></td><td class="m">&lt;OID&gt;.1004</td><td>Checking again.</td></tr>
+      <tr><td class="k">1005 <span class="tag warn">Warning</span></td><td class="m">&lt;OID&gt;.1005</td><td>A CUBE's call records stopped (says which feed).</td></tr>
+      <tr><td class="k">1006 <span class="tag ok">Info</span></td><td class="m">&lt;OID&gt;.1006</td><td>Its call records returned.</td></tr>
+      <tr><td class="k">1000 <span class="tag info">Info</span></td><td class="m">.1001 and .1002</td><td>The Test alarm button.</td></tr>
+    </tbody>
+  </table></div>
+  <p>The event source is "CubeScope DNIS Watch". Trap variables, after the standard uptime and trap OID: <code>.1</code> the description, <code>.2</code> event id, <code>.3</code> alarm, clear or other state, <code>.4</code> CUBE, <code>.5</code> DNIS or the thing watched, <code>.6</code> calls, <code>.7</code> failed, <code>.8</code> percent, <code>.9</code> limit, <code>.10</code> computer, <code>.11</code> an alarm key <code>&lt;CUBE&gt;|&lt;DNIS&gt;</code> shared by an alarm and its clear, <code>.12</code> the whole message on one line, <code>.13</code> the rule's note.</p>
+
+  <h3>Last check and history</h3>
+  <p><strong>Last check</strong> shows every rule on every CUBE with its counts and state, and names anything not being watched. <strong>Alarm history</strong> lists every alarm, clear, warning and test sent, whether the event log took it and which addresses the trap went to (the newest 1,000 are kept). Open alarms survive a restart: a restart neither repeats an alarm nor forgets to clear it.</p>
+  <div class="note">
+    <b class="t">The older PowerShell watcher</b>
+    <p><code>tools\Watch-DnisFailures.ps1</code> did the DNIS alarm before the service had alarms built in, and sends the same events and traps. Use it only where CubeScope cannot run as a service, and never both on one server, or each raises its own alarm. To retire it: <code>Unregister-ScheduledTask -TaskName 'CubeScope DNIS Watch'</code>. Leave its event source; the service uses the same one.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 8 -->
+<section id="s8">
+  <h2><span class="n">8</span>The Settings window</h2>
+  <p>Press <strong>Settings</strong> in the top bar.</p>
+  <h3>Delete old files</h3>
+  <ul>
+    <li><strong>Delete syslog files older than N days</strong> and <strong>Delete call record (SFTP) files older than N days</strong>. 0 keeps them all, and that is the default. Deleting runs in the service or a CubeScope started with <code>--alarms</code>; a CubeScope run by hand says so and sends you to the service's page.</li>
+    <li><strong>What goes.</strong> Only files named the way a syslog server or a CUBE names them, in the folder CubeScope reads (honouring <code>--pattern</code> and <code>--cube</code>, so another device's logs in a shared folder stay), up to two folders down, with their <code>.sha256</code> check files. A file goes only when the hour in its name and its last change are both older than N days.</li>
+    <li><strong>What stays.</strong> Any other name (such as <code>… - Copy.log</code>); the file being written; a file copied in recently. Folder links are not followed.</li>
+    <li><strong>When.</strong> Once an hour, and at once when you save. A new or lower number takes a second press of <em>Save</em>, because deleted files cannot be brought back. The result shows as <em>Last clean-up</em> and goes in the log.</li>
+  </ul>
+  <div class="note warn">
+    <b class="t">Keep N longer than the range you look at</b>
+    <p>Calls in a deleted file stay on the dashboard only until CubeScope restarts, and their raw log lines can no longer be opened.</p>
+  </div>
+  <h3>This CubeScope</h3>
+  <p>Version, computer, whether it runs as the service or in a window, who you are signed in as, whether other computers may connect, the folder it reads, how much it keeps in memory, whether it follows new records, its port, the syslog server's zone, its data folder, the alarms in short, and its troubleshooting log with a <em>View</em> link. Then a table of every CUBE read: files, legs from syslog, legs from call record files, and the other name it logs as.</p>
+</section>
+
+<!-- ============================================================ 9 -->
+<section id="s9">
+  <h2><span class="n">9</span>Running it on a server</h2>
+
+  <h3 id="s9-1"><span class="n">9.1</span>The Windows service</h3>
+  <p>From an <strong>administrator</strong> command prompt on the server that holds the files:</p>
+<pre>CubeScope.exe --logs "D:\Syslog Server\Logs" --install-service</pre>
+  <p>That creates the Windows service <strong>CubeScope</strong> and starts it. The Admin page's <em>Keep CubeScope running as a service</em> does the same. The service:</p>
+  <ul>
+    <li><strong>starts with Windows</strong> (delayed automatic start, as LocalSystem) and runs with nobody logged on. Windows restarts it if it stops on an error.</li>
+    <li><strong>keeps each CUBE's newest 24 hours</strong> (<code>--hours</code>) and reads that window afresh every 6 hours, so its memory stays flat however long it runs: about 320 bytes a call leg, so a day of a busy pair of CUBEs is a few hundred MB.</li>
+    <li><strong>answers this computer only</strong> on <code>http://localhost:8792/</code>, unless remote access is on (<a href="#s9-3">§9.3</a>).</li>
+    <li><strong>runs the alarms</strong> and the clean-up.</li>
+    <li>keeps its settings, alarm state and history in <code>%ProgramData%\CubeScope</code> and its troubleshooting log in <code>%ProgramData%\CubeScope\logs</code>.</li>
+  </ul>
+  <p>It runs the exe from where it is, so put the exe somewhere permanent first. Run <code>--install-service</code> again to change the folder, the port (<code>--serve 8793</code>) or the hours; it updates the service in place and keeps the alarm settings. <code>--uninstall-service</code> stops and removes it; its settings and log stay. While the service holds port 8792, run CubeScope by hand on another port (<code>--serve 8793</code>) to look further back than 24 hours.</p>
+
+  <h3 id="s9-2"><span class="n">9.2</span>The Admin page: receiving call record files over SFTP</h3>
+  <p>The Admin page sets a Windows server up to receive a CUBE's call record files, with no commands to type.</p>
+  <ol class="steps">
+    <li><strong>Copy <code>CubeScope.exe</code> to the server.</strong> If OpenSSH Server is not installed, put the <code>openssh</code> folder (Microsoft's installer) next to it.</li>
+    <li><strong>Right-click it, choose Run as administrator, and cancel the folder window.</strong> The Admin page opens in the browser (Edge or Chrome, not Internet Explorer). <code>CubeScope.exe --admin</code> does the same. In a CubeScope already open, <em>Admin</em> offers to reopen as administrator.</li>
+    <li><strong>Enter the settings</strong>: port (default 2121), folder (default <code>C:\CubeCDR</code>), account (default <code>cube-cdr</code>), password, and the CUBE addresses allowed. <strong>Review changes</strong> lists what will happen and changes nothing. <strong>Apply</strong> does it, stopping at the first problem.</li>
+    <li><strong>Paste the block shown at the bottom of the page on the CUBE.</strong></li>
+  </ol>
+  <p>Apply installs OpenSSH if needed, creates the account or changes its password, gives it write access to the folder, sets the port, limits the account to file transfer inside that folder, restarts OpenSSH and adds a Windows Firewall rule for those CUBE addresses only. OpenSSH's settings file is copied beside itself first (<code>sshd_config.before-cubescope-…</code>) and put back if OpenSSH rejects the new one. The page also shows the current state, the files received and recent sign-ins. Its steps go to <code>%ProgramData%\CubeScope\logs</code>. CubeScope never writes the password anywhere.</p>
+  <div class="note">
+    <b class="t">Who can use it</b>
+    <p>Only a window opened as administrator can make changes, only from the server itself, and only with the key in the link that window opens. The service runs as SYSTEM and answers anyone logged on, so it never does this work.</p>
+  </div>
+
+  <h3 id="s9-3"><span class="n">9.3</span>Remote access: the dashboard from other computers (HTTPS)</h3>
+  <p>By default CubeScope answers only the server it runs on. <strong>Remote access</strong> on the Admin page lets other computers open it over HTTPS on a port of its own: 8794 unless you choose another. Pick a port no other HTTPS program on the server uses; Apply refuses one that is taken.</p>
+  <ul>
+    <li><strong>Who gets in.</strong> People sign in with their Windows account; inside a domain the browser usually does it on its own. Only members of one local group (default <strong>CubeScope Users</strong>) and the server's administrators get in. Anyone else is told which group to ask to join. The Admin page and plain HTTP stay on the server only.</li>
+    <li><strong>What Apply does.</strong> Makes CubeScope's own certificate, or uses one you choose by its thumbprint (for example from your company's certificate authority); creates the group and adds the people you list; binds the certificate to the port; adds a firewall rule (from anywhere, or only the addresses you list); saves the settings in <code>remote.json</code>; restarts the service; then checks that the port answers with that certificate and asks for a sign-in. <strong>Turn off</strong> removes the binding, the rule and the settings; the certificate and the group stay.</li>
+    <li><strong>The browser warning.</strong> Browsers do not know a certificate CubeScope made, so they warn once. To stop that, use a certificate from your company's certificate authority, or import CubeScope's ("CubeScope HTTPS", in the server's Local Computer, Personal store) into the viewers' Trusted Root store.</li>
+    <li><strong>It needs the service</strong>, which reads <code>remote.json</code> when it starts. Each person's first visit in an hour is noted in its log (who, from where). From an administrator prompt, <code>--https &lt;port&gt;</code> and <code>--allow-group &lt;name&gt;</code> do the same for a CubeScope run by hand, once the certificate is bound.</li>
+  </ul>
+  <div class="note warn">
+    <b class="t">Tried so far</b>
+    <p>The Windows sign-in and the group check on this computer's own loopback (a member gets in, a non-member is refused, no sign-in is asked for one), and every Admin step against a stand-in. Not yet run on a real server: making and binding the certificate, the firewall rule, the group, and HTTPS itself.</p>
+  </div>
+
+  <h3 id="s9-4"><span class="n">9.4</span>Detailed SFTP logging, for upload problems</h3>
+  <p>When a CUBE reports <code>%VOICE_FILE_ACCT-3-DUMPFAIL</code> or stops sending, <strong>Detailed SFTP logging</strong> on the Admin page has OpenSSH write down every connection step and every file request (each write's size and OpenSSH's answer) for 15, 30, 60 or 120 minutes. Then it turns itself off, even with the page closed, and saves the lines to one text file you can download from the page. The files are kept in <code>%ProgramData%\CubeScope\sftp-logs</code>, readable by administrators only.</p>
+  <ul>
+    <li><strong>How.</strong> A marked block at the top of OpenSSH's settings file and a more detailed setting on the account's file-transfer command. The lines go to Windows' own OpenSSH event logs: CubeScope turns on <code>OpenSSH/Debug</code> (up to 256 MB) and lets <code>OpenSSH/Operational</code> hold 64 MB, noting how they were. It refuses with under 1 GB free on the system drive.</li>
+    <li><strong>Turning it off</strong>, by the button or by a scheduled task that runs <code>CubeScope.exe --sftp-logging-off</code> as SYSTEM at the end time, takes the block out so OpenSSH's settings are exactly as before, restarts OpenSSH, saves the lines from a minute before it went on, and puts both event logs back as they were. Leave the exe where it is until then. Pressing <em>Turn on</em> again only moves the end time.</li>
+    <li><strong>Each OpenSSH restart cuts off an upload in progress.</strong> The CUBE sends it again; if it moves to flash instead, run <code>file-acct reset</code> on it. For the CUBE's side at the same time: <code>debug voip dump-file-acct</code> (it reaches syslog with <code>logging trap debugging</code>), and <code>undebug all</code> afterwards.</li>
+  </ul>
+  <div class="note warn">
+    <b class="t">Not yet tried on a real server</b>
+    <p>The switch is tested against a stand-in. The first real run will show whether this OpenSSH build writes its file-transfer lines to <code>OpenSSH/Debug</code>. OpenSSH never writes passwords to its log.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 10 -->
+<section id="s10">
+  <h2><span class="n">10</span>Reports and exports</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Output</th><th>From the page</th><th>From the command line</th></tr></thead>
+    <tbody>
+      <tr><td class="k">The dashboard as one HTML file</td><td><em>Report</em></td><td class="m">--report week.html</td></tr>
+      <tr><td class="k">One row per call</td><td><em>CSV</em></td><td class="m">--csv calls.csv</td></tr>
+      <tr><td class="k">Per-day tables, and per hour for 1 to 3 days</td><td></td><td class="m">--summary [--bucket 15m]</td></tr>
+      <tr><td class="k">Every leg, feature, error and trace of matching calls, with raw lines</td><td>a call's detail</td><td class="m">--trace 5550100100 · --trace "has=dump"</td></tr>
+      <tr><td class="k">The dashboard's data</td><td></td><td class="m">--json</td></tr>
+    </tbody>
+  </table></div>
+  <p>Every output follows the range and the filter. A report opens anywhere with no CubeScope running: the charts and tables as they were, and the first 500 calls of the list. Opening one call's detail needs the running CubeScope. The CSV adds the call record columns only when call record files were read, so a syslog-only CSV keeps the same columns as before.</p>
+<pre>CubeScope.exe --logs D:\Syslog\192.0.2.10 --from 2026-09-28 --to 2026-09-28 --bucket 15m --summary
+CubeScope.exe --logs D:\Syslog\192.0.2.10 --filter "called=251* result=unanswered" --csv failed.csv
+CubeScope.exe --logs D:\Syslog --zone server --report week.html</pre>
+</section>
+
+<!-- ============================================================ 11 -->
+<section id="s11">
+  <h2><span class="n">11</span>Command reference</h2>
+  <p><code>CubeScope.exe --help</code> prints the same list.</p>
+  <h3>What to read</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="m">--logs &lt;folder&gt;</td><td>Syslog files, call record files, or a folder of one folder per CUBE; looked for two levels down.</td></tr>
+      <tr><td class="m">--cube &lt;name&gt;</td><td>Only this CUBE; repeat for several.</td></tr>
+      <tr><td class="m">--days &lt;n&gt; · --all</td><td>The newest n days (default 14) · every file.</td></tr>
+      <tr><td class="m">--from &lt;t&gt; --to &lt;t&gt;</td><td>A range: <code>yyyy-MM-dd</code> or <code>yyyy-MM-ddTHH:mm</code>.</td></tr>
+      <tr><td class="m">--pattern &lt;glob&gt;</td><td>File name pattern (default <code>*.log</code>).</td></tr>
+      <tr><td class="m">--rules &lt;file&gt;</td><td>Number rules (default <code>cubescope.rules</code> beside the exe, else built in).</td></tr>
+      <tr><td class="m">--threads &lt;n&gt;</td><td>Files read at once (default the processor count, at most 8).</td></tr>
+      <tr><td class="m">--server-zone &lt;z&gt;</td><td>The syslog server's zone: <code>UTC</code>, <code>UTC-6</code>, <code>UTC+5:30</code>, <code>local</code>, or a Windows zone name.</td></tr>
+      <tr><td class="m">--zone &lt;z&gt;</td><td>The clock times are shown on: <code>cube</code> (default), <code>server</code>, or a zone as above.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>What to do (none of these means --summary)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="m">--serve [port]</td><td>The dashboard on <code>http://localhost:&lt;port&gt;/</code> (default 8792), following new records.</td></tr>
+      <tr><td class="m">--open · --no-open</td><td>Open the browser on the dashboard, or not.</td></tr>
+      <tr><td class="m">--no-live</td><td>Read once; do not follow new records.</td></tr>
+      <tr><td class="m">--summary · --bucket &lt;b&gt;</td><td>Console tables · the second table's step: <code>1m 5m 15m 30m 1h 3h 6h 1d</code>.</td></tr>
+      <tr><td class="m">--filter "&lt;f&gt;"</td><td>Only calls matching the filter.</td></tr>
+      <tr><td class="m">--trace &lt;id|number|filter&gt;</td><td>The matching calls in full, with raw lines (the newest 20).</td></tr>
+      <tr><td class="m">--csv &lt;file&gt; · --report &lt;file&gt; · --json</td><td>See <a href="#s10">§10</a>.</td></tr>
+      <tr><td class="m">--rules-sample</td><td>Print the built-in rules (<a href="#a1">Appendix A</a>).</td></tr>
+      <tr><td class="m">--admin</td><td>The Admin page (needs an administrator prompt).</td></tr>
+      <tr><td class="m">--selftest · --pickcheck</td><td>The built-in tests · a check of the folder window's plumbing that shows nothing.</td></tr>
+      <tr><td class="m">--dashboard &lt;file&gt;</td><td>Serve this page file instead of the built-in one (for development).</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Service, alarms and remote access</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="m">--install-service</td><td>(Administrator) install or update the service with these <code>--logs</code>, <code>--serve</code> and <code>--hours</code>.</td></tr>
+      <tr><td class="m">--uninstall-service</td><td>(Administrator) stop and remove it; settings and log stay.</td></tr>
+      <tr><td class="m">--hours &lt;n&gt;</td><td>Keep each CUBE's newest n hours, read afresh every n/4 hours.</td></tr>
+      <tr><td class="m">--local-only</td><td>Answer this computer only.</td></tr>
+      <tr><td class="m">--https &lt;port&gt; · --allow-group &lt;name&gt;</td><td>Also answer other computers over HTTPS after a Windows sign-in, for this group's members and the server's administrators.</td></tr>
+      <tr><td class="m">--alarms</td><td>Run the alarms and the clean-up here.</td></tr>
+      <tr><td class="m">--data-dir &lt;folder&gt;</td><td>Settings, alarm state and log (default <code>%ProgramData%\CubeScope</code>).</td></tr>
+      <tr><td class="m">--sftp-logging-off</td><td>Turn detailed SFTP logging off; what its scheduled task runs.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">For testing only: <code>--alarm-at &lt;UTC time&gt;</code> judges a past hour of an archive, <code>--alarm-event-file &lt;file&gt;</code> writes events to a file instead of the Application log, and <code>--rebuild-minutes &lt;n&gt;</code> reads the window afresh that often.</p>
+</section>
+
+<!-- ============================================================ 12 -->
+<section id="s12">
+  <h2><span class="n">12</span>Troubleshooting</h2>
+  <h3>Where the logs are</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Run</th><th>Troubleshooting log</th></tr></thead>
+    <tbody>
+      <tr><td class="k">The service, or a run with <code>--alarms</code> or <code>--hours</code></td><td class="m">%ProgramData%\CubeScope\logs</td></tr>
+      <tr><td class="k">The Admin page</td><td class="m">%ProgramData%\CubeScope\logs</td></tr>
+      <tr><td class="k">Flash fetch script</td><td class="m">%ProgramData%\CubeScope\FlashFetch\logs</td></tr>
+      <tr><td class="k">PowerShell DNIS watcher</td><td class="m">%ProgramData%\CubeScope\DnisWatch</td></tr>
+      <tr><td class="k">Detailed SFTP logging output</td><td class="m">%ProgramData%\CubeScope\sftp-logs</td></tr>
+    </tbody>
+  </table></div>
+  <p>Each log is a few files of 2 MB at most, oldest dropped first. <em>Settings</em> shows the log in use with a <em>View</em> link. A CubeScope started by hand with only <code>--serve</code> keeps no log; its console window shows what it is doing.</p>
+
+  <h3>Common problems</h3>
+  <div class="tw"><table>
+    <thead><tr><th>You see</th><th>Likely reason and what to do</th></tr></thead>
+    <tbody>
+      <tr><td class="k">No calls</td><td>The CUBE sends no call records: add <code>gw-accounting syslog</code>. Or the files are named differently: try <code>--pattern</code>. <code>--summary</code> says how many files and lines it read.</td></tr>
+      <tr><td class="k">"Last hour" is empty</td><td>The newest record is older than an hour (an archive): use <em>All</em> or a typed range. While following, a CUBE whose clock runs more than ten minutes ahead is left out when finding "now"; check <em>Clocks and time zones</em>.</td></tr>
+      <tr><td class="k">Calls on different CUBEs do not line up</td><td>They are on their own clocks. Set <em>Times in</em> to the server's clock or UTC.</td></tr>
+      <tr><td class="k">Messages missing</td><td>Syslog over UDP loses messages under load: use <code>transport tcp</code>. Also check the syslog server keeps up and that nothing filters the CUBE's messages.</td></tr>
+      <tr><td class="k">No quality figures</td><td>For syslog: <code>gw-accounting syslog stats</code> and <code>logging trap debugging</code>. For files: the <code>media</code> and <code>call-quality</code> settings under <code>voice service voip</code> (<a href="#s4-2">§4.2</a>). Even then only some legs are measured; on one real CUBE about one answered leg in five had a MOS.</td></tr>
+      <tr><td class="k">One CUBE shows twice</td><td>Its two feeds have not been paired: they need three identical legs in the same hours. Check that both cover the same time. See <a href="#s4-3">§4.3</a>.</td></tr>
+      <tr><td class="k">Many small call record files, DUMPFAIL errors</td><td>The SFTP upload problem in <a href="#s4-5">§4.5</a>.</td></tr>
+      <tr><td class="k">Alarm 1005 will not clear after a feed was stopped on purpose</td><td>Delete <code>records-seen.json</code> in the data folder.</td></tr>
+      <tr><td class="k">The dashboard is slow to open or the server is short of memory</td><td><code>--days 7</code>, <code>--from</code>/<code>--to</code>, or <code>--cube</code> to read less. The service keeps 24 hours.</td></tr>
+      <tr><td class="k">Port 8792 is in use</td><td>The service holds it. Run by hand with <code>--serve 8793</code>.</td></tr>
+      <tr><td class="k">Other computers cannot connect</td><td>Remote access is off, or the person is not in the group, or the firewall rule limits addresses. <em>Settings</em> shows how other computers reach it.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================================================ 13 -->
+<section id="s13">
+  <h2><span class="n">13</span>How it works, and limits</h2>
+  <h3>How the calls are put together</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Fact about the records</th><th>What CubeScope does with it</th></tr></thead>
+    <tbody>
+      <tr><td>The call ID is written three ways: with leading zeros dropped, padded, and cut to 12 characters in failure traces.</td><td>All three are matched to one call.</td></tr>
+      <tr><td>A leg's numbers record follows its history record, sometimes in the next file.</td><td>Gives the leg its calling and called numbers.</td></tr>
+      <tr><td><code>CallOrigin 2</code> is a leg the CUBE answered; <code>1</code> one it placed.</td><td>In and out are told apart by this, never by order.</td></tr>
+      <tr><td>An unanswered leg has its connect time equal to its disconnect time.</td><td>Answered means a placed leg connected before it disconnected.</td></tr>
+      <tr><td>On a refused call the inbound leg carries only the CUBE's generic 47.</td><td>The outbound leg's cause decides the result.</td></tr>
+      <tr><td>The side that hangs up has its leg cleared first; the others follow within milliseconds.</td><td>Released by = the far end of the leg that disconnected first, by time, not by order in the file.</td></tr>
+      <tr><td>Bridged legs mirror each other's packet counts.</td><td>Audio is judged per talking leg; the dialer's signalling-only leg is never judged.</td></tr>
+      <tr><td>On a dialer call the customer leg counts no packets until the transfer.</td><td>Its audio is judged from the transfer on.</td></tr>
+      <tr><td>IOS numbers every message it sends.</td><td>Gaps are counted as messages missing.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><code>DESIGN.md</code> in the source has the measurements behind each of these, from a 10-day archive.</p>
+
+  <h3>Speed and memory</h3>
+  <p>On the reference archive (one CUBE, 10 days, 227 hourly files, 704 MB, 884,807 legs, 320,258 calls): read in about 6 seconds, about 290 MB of memory once read, never more than about 475 MB while reading, and a 10-day query in 0.3 seconds. That is roughly 320 bytes a leg. Only the records are kept; raw lines and a call's evidence are read back from the files when a call is opened. Events other than call records are capped at 100,000 per CUBE (counted beyond that). The console prints the memory in use after the read.</p>
+
+  <h3>Security</h3>
+  <ul>
+    <li>A CubeScope run by hand answers <code>localhost</code>. Other computers get in only through remote access, over HTTPS, after a Windows sign-in, as a group member or administrator.</li>
+    <li>Anything that changes settings needs a header the page sends and the page's own address as origin, so another website cannot change them through your browser.</li>
+    <li>The Admin page works only from the server itself, in a window opened as administrator, with that window's key.</li>
+    <li>Passwords never go in a log, a settings file or a page answer. <code>--trace</code> and the raw lines show the CUBE's own messages as they are, and a CUBE's <code>DUMPFAIL</code> message can include the SFTP password in its address. Treat raw lines and reports from such a CUBE as sensitive.</li>
+  </ul>
+
+  <h3>Limits</h3>
+  <ul>
+    <li>A call appears only once it has ended.</li>
+    <li>The records do not say when ringing began, so ring time is from setup and canceled-after-N-seconds counts from setup.</li>
+    <li>Not yet run on a real server or CUBE: the HTTPS setup (<a href="#s9-3">§9.3</a>), the detailed SFTP logging switch (<a href="#s9-4">§9.4</a>), and the flash fetch script (<a href="#s4-4">§4.4</a>). The Admin page's account creation and OpenSSH install have run only against a stand-in; its settings-file change, restart, firewall rule and answer check have run on a real server.</li>
+    <li>Quality charts have run only on invented figures; the filters and totals are built and tested.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ A -->
+<section id="a1">
+  <h2><span class="n">A</span>Number rules</h2>
+  <p>Legs can be labelled from their numbers, for filtering (<code>tag=dialer</code>) and to mark legs that never carry audio. <code>CubeScope.exe --rules-sample</code> prints the built-in rules; save them as <code>cubescope.rules</code> beside the exe (or pass <code>--rules &lt;file&gt;</code>) to change them:</p>
+<pre>signalling-only in cgn:""          <span class="c">the SIP dialer's leg has no calling number and no audio</span>
+tag dialer in cgn:""
+tag cvp-label out cdn:555*
+tag extension out peer:re:\d{4,6}
+tag external peer:re:1?[2-9]\d{9}</pre>
+  <p>Each line is an action (<code>tag &lt;name&gt;</code> or <code>signalling-only</code>), optionally <code>in</code> or <code>out</code> for the leg's direction, and a test on the calling number (<code>cgn:</code>), called number (<code>cdn:</code>) or far-end number (<code>peer:</code>), written as in the filters.</p>
+</section>
+
+<!-- ============================================================ B -->
+<section id="a2">
+  <h2><span class="n">B</span>Files it keeps</h2>
+  <p>In the data folder, <code>%ProgramData%\CubeScope</code> unless <code>--data-dir</code> says otherwise:</p>
+  <div class="tw"><table>
+    <thead><tr><th>File</th><th>Holds</th></tr></thead>
+    <tbody>
+      <tr><td class="m">alarms.json</td><td>The alarm rules, how to raise them, and the retention settings. Holds your management stations and community; keep it on the server.</td></tr>
+      <tr><td class="m">alarm-state.json</td><td>Open alarms, so a restart neither repeats nor forgets them.</td></tr>
+      <tr><td class="m">alarm-history.jsonl</td><td>The newest 1,000 alarms, clears, warnings and tests sent.</td></tr>
+      <tr><td class="m">records-seen.json</td><td>Which CUBEs and feeds have sent call records, for the no-records alarm.</td></tr>
+      <tr><td class="m">cube-links.json</td><td>Syslog and file feeds paired as one CUBE.</td></tr>
+      <tr><td class="m">config-history.json</td><td>The newest configuration changes per CUBE.</td></tr>
+      <tr><td class="m">remote.json</td><td>Remote access: HTTPS port, certificate thumbprint, group, firewall addresses.</td></tr>
+      <tr><td class="m">logs\</td><td>The troubleshooting log.</td></tr>
+      <tr><td class="m">sftp-logs\</td><td>Saved detailed SFTP logging output (administrators only).</td></tr>
+    </tbody>
+  </table></div>
+  <p>Beside the exe, optionally: <code>cubescope.rules</code>. Nothing else is written outside the data folder, apart from OpenSSH's settings file when you use the Admin page.</p>
+</section>
+
+<!-- ============================================================ C -->
+<section id="a3">
+  <h2><span class="n">C</span>Common release causes</h2>
+  <p>The CUBE prints causes in hexadecimal; CubeScope shows them in decimal with their names. The ones you will see most:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Cause</th><th>Name</th><th>Usually means</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>Unallocated number</td><td>The number does not exist. Counted as rejected.</td></tr>
+      <tr><td class="n">16</td><td>Normal call clearing</td><td>An ordinary end of call; on an unanswered call, a cancel while ringing.</td></tr>
+      <tr><td class="n">17</td><td>User busy</td><td>Busy.</td></tr>
+      <tr><td class="n">18</td><td>No user responding</td><td>No answer.</td></tr>
+      <tr><td class="n">19</td><td>No answer from user</td><td>No answer.</td></tr>
+      <tr><td class="n">20</td><td>Subscriber absent</td><td>No answer.</td></tr>
+      <tr><td class="n">21</td><td>Call rejected</td><td>Refused by the far end. Counted as rejected.</td></tr>
+      <tr><td class="n">22</td><td>Number changed</td><td>Counted as rejected.</td></tr>
+      <tr><td class="n">28</td><td>Invalid number format</td><td>Counted as rejected.</td></tr>
+      <tr><td class="n">38</td><td>Network out of order</td><td>A failure.</td></tr>
+      <tr><td class="n">41</td><td>Temporary failure</td><td>A failure; often a SIP 5xx or a timeout.</td></tr>
+      <tr><td class="n">47</td><td>Resource unavailable</td><td>The CUBE's generic cause. On the inbound leg of a refused call it says little; the outbound leg's cause decides.</td></tr>
+      <tr><td class="n">102</td><td>Recovery on timer expiry</td><td>A timer ran out, such as no answer to an INVITE.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>CubeScope 1.2 · this manual matches the program's README and its --help text · examples use made-up numbers and documentation addresses (192.0.2.x)</footer>
+</main>
+</div>
+</body>
+</html>
