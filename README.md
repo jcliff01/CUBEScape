@@ -1,5 +1,7 @@
 # CUBEScape
 
+**Project credit:** A coworker of mine came up with the original idea for this project.
+
 Windows-oriented C# source for CubeScope, a Cisco Unified Border Element log and call-record analysis tool. The [manual](manual.html) describes log ingestion, calls, alerts, and the local dashboard. To read it in a browser, download the repository and open `manual.html`.
 
 ## Build and download status
