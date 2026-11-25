@@ -1,0 +1,30 @@
+name: Sample report
+
+# Builds CubeScope, reads the made-up calls in samples/cube1 and saves the dashboard as one HTML
+# file (an artifact), so the README picture can be made from it. Run it by hand when needed.
+on:
+  workflow_dispatch:
+  push:
+    branches: [docs-and-fixes]
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: cmd
+        run: build.bat
+      - name: Summary of the sample day
+        shell: cmd
+        run: bin\CubeScope.exe --logs samples\cube1 --all --summary
+      - name: Dashboard as one HTML file
+        shell: cmd
+        run: bin\CubeScope.exe --logs samples\cube1 --all --report report.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sample-report
+          path: report.html
