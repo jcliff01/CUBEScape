@@ -1,0 +1,27 @@
+name: Build and self-test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with the Windows C# compiler and run the self-test
+        shell: cmd
+        run: build.bat test
+      - name: Upload CubeScope.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: CubeScope
+          path: |
+            bin/CubeScope.exe
+            manual.html
+          if-no-files-found: error
+          retention-days: 30
