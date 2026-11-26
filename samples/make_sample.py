@@ -15,7 +15,7 @@ def H(t):
 def leg(guid, origin, setup, peer, cause, text, connect, disc, talk, oneway=False):
     pkts = int(talk * 50); bytes_ = pkts * 160
     tx, rxp = pkts, (0 if oneway else pkts)
-    return (disc, H(disc) + f"%VOIPAAA-5-VOIP_CALL_HISTORY: CallLegType 2, ConnectionId {guid}, SetupTime {T(setup)}, "
+    return (disc, f"%VOIPAAA-5-VOIP_CALL_HISTORY: CallLegType 2, ConnectionId {guid}, SetupTime {T(setup)}, "
             f"PeerAddress {peer}, PeerSubAddress , DisconnectCause {cause}  , DisconnectText {text}, ConnectTime {T(connect)}, "
             f"DisconnectTime {T(disc)}, CallOrigin {origin}, ChargedUnits 0, InfoType 2, TransmitPackets {tx}, "
             f"TransmitBytes {tx * 160}, ReceivePackets {rxp}, ReceiveBytes {rxp * 160}")
@@ -40,8 +40,9 @@ while t < day.replace(hour=17, minute=30):
             lines.append(leg(guid, origin, t, peer, cause, text, end, end, 0))
 lines.sort()
 files = {}
+# Syslog sequence numbers go up by one per message in the order they were sent.
 for when, text in lines:
-    files.setdefault(when.strftime("cube1-%Y-%m-%d-%H.log"), []).append(text)
+    files.setdefault(when.strftime("cube1-%Y-%m-%d-%H.log"), []).append(H(when) + text)
 for name, rows in files.items():
     with open(os.path.join(out, name), "w", newline="\r\n") as f:
         f.write("\n".join(rows) + "\n")
