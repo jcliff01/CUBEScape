@@ -1,14 +1,14 @@
 name: Sample report
 
 # Builds CubeScope, reads the made-up calls in samples/cube1 and saves the dashboard as one HTML
-# file (an artifact), so the README picture can be made from it. Run it by hand when needed.
+# file, samples/sample-dashboard.html, which anyone can open to see what CubeScope shows. Run it by hand when needed.
 on:
   workflow_dispatch:
   push:
     branches: [docs-and-fixes]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   report:
@@ -23,8 +23,12 @@ jobs:
         run: bin\CubeScope.exe --logs samples\cube1 --all --summary
       - name: Dashboard as one HTML file
         shell: cmd
-        run: bin\CubeScope.exe --logs samples\cube1 --all --report report.html
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sample-report
-          path: report.html
+        run: bin\CubeScope.exe --logs samples\cube1 --all --report samples\sample-dashboard.html
+      - name: Save it to the branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add samples/sample-dashboard.html
+          git commit -m "Update the sample dashboard" || echo "No change"
+          git push
