@@ -4,6 +4,8 @@
 
 CubeScope turns the call records a Cisco CUBE (Cisco Unified Border Element) writes into a dashboard in your web browser. It joins the pieces of each call back together and shows how calls ended, who hung up, whether the audio worked, and whether records are going missing. Everything stays on your computer: there's no database and nothing goes to the internet.
 
+![CubeScope's dashboard for a made-up day of 438 calls: results, talk time, who hung up and audio problems](docs/screenshot.png)
+
 ![Windows only](https://img.shields.io/badge/runs%20on-Windows-blue)
 
 ## Download
@@ -22,6 +24,12 @@ CubeScope turns the call records a Cisco CUBE (Cisco Unified Border Element) wri
 Click any call to see its legs, timeline, causes in plain words and the raw log lines behind it.
 
 **The CUBE has to send its call records.** For syslog, its configuration needs `gw-accounting syslog` and `logging host <your syslog server>`. Without the first line the log files have no calls in them. The manual's section 4 covers call record files (SFTP) too.
+
+## Try it with the sample day
+
+The folder [`samples/cube1`](samples/cube1) holds a made-up day of call records from one CUBE: 438 calls, with invented numbers and addresses. Download the repository (green **Code** button → **Download ZIP**), unzip it, run CubeScope.exe and pick that folder.
+
+To see the result without running anything, download [`samples/sample-dashboard.html`](samples/sample-dashboard.html) and open it in your browser. It's the saved dashboard for that day, the picture above.
 
 ## macOS and Linux
 
